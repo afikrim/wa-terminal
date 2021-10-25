@@ -90,7 +90,7 @@ def message(sender: str, destination: str, text: str) -> Union[str, Exception]:
 
         options = webdriver.FirefoxOptions()
         options.add_argument("--no-sandbox")
-        # options.add_argument("--headless")
+        options.add_argument("--headless")
         options.add_argument("--window-size=1920x1080")
         options.add_argument("-profile")
         options.add_argument(profile_dir)
