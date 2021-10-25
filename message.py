@@ -56,6 +56,7 @@ def message_user(driver) -> Union[bool, Exception, bool]:
 
         return [False, e, False]
 
+    time.sleep(2)
     if check_element(driver, By.CSS_SELECTOR, '[data-icon="send"]'):
         send_icon = driver.find_element(By.CSS_SELECTOR, '[data-icon="send"]')
         send_button = send_icon.find_element(By.XPATH, "..")
@@ -89,7 +90,7 @@ def message(sender: str, destination: str, text: str) -> Union[str, Exception]:
 
         options = webdriver.FirefoxOptions()
         options.add_argument("--no-sandbox")
-        options.add_argument("--headless")
+        # options.add_argument("--headless")
         options.add_argument("--window-size=1920x1080")
         options.add_argument("-profile")
         options.add_argument(profile_dir)
