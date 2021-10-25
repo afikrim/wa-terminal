@@ -39,6 +39,9 @@ class Login(object):
     def __init__(self, phone: str) -> None:
         self.phone = phone
 
+    def save_user_qr(self, element, path) -> None:
+        element.screenshot(path)
+
     def login_user(self) -> Union[bool, Exception]:
         print("INFO: prepare qr code name")
         qr_code_name = path.join(os.getcwd(), "qr_codes", "%s.png" % self.phone)
@@ -49,7 +52,6 @@ class Login(object):
 
             while not qr_code_scanned:
                 print("INFO: wait qr code to be scanned")
-                self.driver.find_element(By.XPATH, "/html").screenshot("qr_test.png")
                 time.sleep(1)
 
                 if not check_element(self.driver, By.CSS_SELECTOR, ".landing-wrapper"):
@@ -116,7 +118,7 @@ class Login(object):
                 last_qr_code_ref = qr_code_ref
 
                 time.sleep(1)
-                qr_code.screenshot(qr_code_name)
+                self.save_user_qr(qr_code, qr_code_name)
 
                 print("Please scan your QR Code")
 
