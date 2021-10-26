@@ -1,7 +1,7 @@
 import argparse
 
 from login import Login
-from message import message
+from message import Message
 
 
 def main():
@@ -47,12 +47,12 @@ def main():
     if command == "login":
         force = args.force
 
-        [program_message, error] = Login(phone, force)
+        [program_message, error] = Login(phone).login(force)
     elif command == "message":
         destination = args.destination
         text = args.text
 
-        [program_message, error] = message(phone, destination, text)
+        [program_message, error] = Message(phone, destination, text).message()
 
     print(program_message)
     if error:

@@ -4,39 +4,20 @@ import time
 from os import path
 from typing import Union
 from selenium import webdriver
-from selenium.common.exceptions import (
-    NoSuchAttributeException,
-    NoSuchElementException,
-    TimeoutException,
-)
+from selenium.common.exceptions import TimeoutException
 from selenium.webdriver.common.by import By
 from selenium.webdriver.support import expected_conditions as EC
 from selenium.webdriver.support.ui import WebDriverWait
 
-
-def check_element(driver, by, locator):
-    try:
-        driver.find_element(by, locator)
-
-        return True
-    except NoSuchElementException:
-        return False
-
-
-def check_attribute(element, attribute):
-    try:
-        attribute = element.get_attribute(attribute)
-
-        return True if attribute else False
-    except NoSuchAttributeException:
-        return False
+from support.validate import check_attribute, check_element
 
 
 class Login(object):
     driver: webdriver = None
     phone: str = None
+    force: bool = False
 
-    def __init__(self, phone: str) -> None:
+    def __init__(self, phone: str, force: bool) -> None:
         self.phone = phone
 
     def save_user_qr(self, element, path) -> None:
