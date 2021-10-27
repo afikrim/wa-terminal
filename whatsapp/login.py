@@ -17,7 +17,7 @@ class Login(object):
     phone: str = None
     force: bool = False
 
-    def __init__(self, phone: str, force: bool) -> None:
+    def __init__(self, phone: str) -> None:
         self.phone = phone
 
     def save_user_qr(self, element, path) -> None:

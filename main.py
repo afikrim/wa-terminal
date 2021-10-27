@@ -1,7 +1,7 @@
 import argparse
 
-from login import Login
-from message import Message
+from whatsapp.login import Login
+from whatsapp.message import Message
 
 
 def main():
