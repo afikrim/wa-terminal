@@ -14,7 +14,7 @@ def get_requirements():
 def get_packages_and_requirements():
     reqs = get_requirements()
 
-    exclude = ["support*"]
+    exclude = ["whatsapp.support*"]
     packs = find_packages(exclude=exclude)
 
     return packs, reqs
