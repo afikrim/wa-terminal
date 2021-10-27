@@ -130,6 +130,20 @@ class Login(object):
         except Exception as e:
             return [False, e]
 
+    def check_session_exists(
+        self, profile_dir: str, force: bool
+    ) -> Union[bool, str, Exception]:
+        if path.exists(profile_dir):
+            if not force:
+                return [False, "You already logged in.", None]
+
+            try:
+                shutil.rmtree(profile_dir)
+            except Exception as e:
+                return [False, "There is an error while deleting directory", e]
+
+        return [True, None, None]
+
     def login(self, force: bool = False) -> Union[str, Exception]:
         try:
             if self.phone[0] == "0":
@@ -141,11 +155,13 @@ class Login(object):
             profile_dir = path.join(os.getcwd(), "profile", self.phone)
             success = False
 
-            if path.exists(profile_dir):
-                if not force:
-                    return ["You already logged in.", None]
-
-                shutil.rmtree(profile_dir)
+            [
+                session_status,
+                session_message,
+                session_error,
+            ] = self.check_session_exists(profile_dir, force)
+            if not session_status:
+                return [session_message, session_error]
 
             os.mkdir(profile_dir)
 
