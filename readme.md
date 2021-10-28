@@ -29,4 +29,4 @@ message required arguments:
 - Before you run the app, make sure you have geckodriver and firefox in your path, if you don't have them in your path variable, then export it before running the program.
 - When you run login command, this app will take a screenshot of the QR Code and store it to qr_codes folder. So you guys can scan it to login into your new session. After the first login there is no need to login again to send message.
 - When you run into issue like timeout or something when sending message, please try to login again with options `-f` to forcely generate new session.
-- This packages can be install and import in python, the example use of this package in ![Telegram Bot](http://t.me/SendWaBot)
+- This packages can be install and import in python, the example use of this package in [Telegram Bot](http://t.me/SendWaBot)
