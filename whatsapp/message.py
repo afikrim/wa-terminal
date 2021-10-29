@@ -2,7 +2,7 @@ import os
 import re
 import time
 from os import path
-from typing import Union
+from typing import List, Union
 from selenium import webdriver
 from selenium.common.exceptions import TimeoutException
 from selenium.webdriver.common.by import By
@@ -23,7 +23,7 @@ class Message(object):
         self.destination = destination
         self.text = text
 
-    def message_user(self) -> Union[bool, Exception, bool]:
+    def click_send_button(self) -> Union[bool, Exception, bool]:
         try:
             WebDriverWait(self.driver, 10).until(
                 EC.presence_of_element_located((By.CSS_SELECTOR, '[data-icon="send"]'))
@@ -60,10 +60,45 @@ class Message(object):
 
         return [False, None, False]
 
+    def send_message(self, destination):
+        i = 0
+        success = False
+
+        while not success and i < 5:
+            self.driver.get(
+                "https://web.whatsapp.com/send/?phone=%s&text=%s"
+                % (destination, self.text)
+            )
+
+            [success, error, throwable] = self.click_send_button()
+            if not success:
+                if error:
+                    error_message = None
+                    if hasattr(error, "message"):
+                        error_message = error.message
+                    else:
+                        error_message = error
+
+                    print("%s: %s" % (destination, error_message))
+                    print("%s: %s" % (destination, "Retrying..."))
+                    if throwable:
+                        return [error_message, error]
+
+            i += 1
+
+        return [
+            success,
+            "%s: %s"
+            % (
+                destination,
+                "Successfully sent your message"
+                if (success)
+                else "Request error because too many try",
+            ),
+        ]
+
     def message(self) -> Union[str, Exception]:
         try:
-            success = False
-
             if self.sender[0] == "0":
                 return [
                     "Phone format should looks like this, [area][phone] => 628123xxxxxx",
@@ -91,39 +126,18 @@ class Message(object):
             options.add_argument("-profile")
             options.add_argument(profile_dir)
 
-            while not success:
-                self.driver = webdriver.Firefox(options=options)
-                self.driver.get(
-                    "https://web.whatsapp.com/send/?phone=%s&text=%s"
-                    % (self.destination, self.text)
-                )
-
-                [success, error, throwable] = self.message_user()
-                if not success:
-                    self.driver.close()
-
-                    if error:
-                        error_message = None
-                        if hasattr(error, "message"):
-                            error_message = error.message
-                        else:
-                            error_message = error
-
-                        if throwable:
-                            return [error_message, error]
-                    continue
-
+            self.driver = webdriver.Firefox(options=options)
+            [status, message] = self.send_message(self.destination)
             self.driver.close()
-            return ["Your message successfully sent", None]
+            return [message, None]
         except Exception as e:
             if self.driver:
                 self.driver.close()
             return ["There is an Error", e]
 
-    def broadcast(self) -> Union[str, Exception]:
+    def broadcast(self) -> List[Union[str, Exception]]:
         try:
             destinations = re.sub(r"(\ )+", "", self.destination).split(",")
-            success = False
 
             if self.sender[0] == "0":
                 return [
@@ -154,29 +168,14 @@ class Message(object):
             options.add_argument(profile_dir)
 
             self.driver = webdriver.Firefox(options=options)
+
+            messages = []
             for destination in destinations:
-                success = False
-                while not success:
-                    self.driver.get(
-                        "https://web.whatsapp.com/send/?phone=%s&text=%s"
-                        % (destination, self.text)
-                    )
-
-                    [success, error, throwable] = self.message_user()
-                    if not success:
-                        if error:
-                            error_message = None
-                            if hasattr(error, "message"):
-                                error_message = error.message
-                            else:
-                                error_message = error
-
-                            if throwable:
-                                return [error_message, error]
-                        continue
+                [status, message] = self.send_message(destination)
+                messages.append([message, None])
 
             self.driver.close()
-            return ["Your message successfully sent", None]
+            return messages
         except Exception as e:
             if self.driver:
                 self.driver.close()

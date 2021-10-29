@@ -48,16 +48,20 @@ def main():
         force = args.force
 
         [program_message, error] = Login(phone).login(force)
+        print(program_message)
     elif command == "message":
         destination = args.destination
         text = args.text
 
         if len(destination.split(",")) > 1:
-            [program_message, error] = Message(phone, destination, text).broadcast()
+            program_messages = Message(phone, destination, text).broadcast()
+
+            for program_message in program_messages:
+                print(program_message[0])
         else:
             [program_message, error] = Message(phone, destination, text).message()
+            print(program_message)
 
-    print(program_message)
     if error:
         raise error
 
