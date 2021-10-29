@@ -62,19 +62,26 @@ class Message(object):
 
     def message(self) -> Union[str, Exception]:
         try:
+            success = False
+
             if self.sender[0] == "0":
                 return [
                     "Phone format should looks like this, [area][phone] => 628123xxxxxx",
                     Exception("PhoneFormatNotValid"),
                 ]
-
             profile_dir = path.join(os.getcwd(), "profile", self.sender)
-            success = False
 
             if not path.exists(profile_dir):
                 return [
                     "You haven't logged in yet, please login first",
                     Exception("NotLogIn"),
+                ]
+
+            if self.destination[0] == "0":
+                return [
+                    "%s: Phone format should looks like this, [area][phone] => 628123xxxxxx"
+                    % self.destination,
+                    Exception("PhoneFormatNotValid"),
                 ]
 
             options = webdriver.FirefoxOptions()
@@ -116,7 +123,6 @@ class Message(object):
     def broadcast(self) -> Union[str, Exception]:
         try:
             destinations = re.sub(r"(\ )+", "", self.destination).split(",")
-            profile_dir = path.join(os.getcwd(), "profile", self.sender)
             success = False
 
             if self.sender[0] == "0":
@@ -124,6 +130,7 @@ class Message(object):
                     "Phone format should looks like this, [area][phone] => 628123xxxxxx",
                     Exception("PhoneFormatNotValid"),
                 ]
+            profile_dir = path.join(os.getcwd(), "profile", self.sender)
 
             if not path.exists(profile_dir):
                 return [
