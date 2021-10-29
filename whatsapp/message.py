@@ -1,4 +1,5 @@
 import os
+import re
 import time
 from os import path
 from typing import Union
@@ -104,6 +105,68 @@ class Message(object):
                         if throwable:
                             return [error_message, error]
                     continue
+
+            self.driver.close()
+            return ["Your message successfully sent", None]
+        except Exception as e:
+            if self.driver:
+                self.driver.close()
+            return ["There is an Error", e]
+
+    def broadcast(self) -> Union[str, Exception]:
+        try:
+            destinations = re.sub(r"(\ )+", "", self.destination).split(",")
+            profile_dir = path.join(os.getcwd(), "profile", self.sender)
+            success = False
+
+            if self.sender[0] == "0":
+                return [
+                    "Phone format should looks like this, [area][phone] => 628123xxxxxx",
+                    Exception("PhoneFormatNotValid"),
+                ]
+
+            if not path.exists(profile_dir):
+                return [
+                    "You haven't logged in yet, please login first",
+                    Exception("NotLogIn"),
+                ]
+
+            for destination in destinations:
+                if destination[0] == "0":
+                    return [
+                        "%s: Phone format should looks like this, [area][phone] => 628123xxxxxx"
+                        % destination,
+                        Exception("PhoneFormatNotValid"),
+                    ]
+
+            options = webdriver.FirefoxOptions()
+            options.add_argument("--no-sandbox")
+            options.add_argument("--headless")
+            options.add_argument("--window-size=1920x1080")
+            options.add_argument("-profile")
+            options.add_argument(profile_dir)
+
+            self.driver = webdriver.Firefox(options=options)
+            for destination in destinations:
+                success = False
+                while not success:
+                    self.driver.get(
+                        "https://web.whatsapp.com/send/?phone=%s&text=%s"
+                        % (destination, self.text)
+                    )
+
+                    [success, error, throwable] = self.message_user()
+                    if not success:
+                        if error:
+                            error_message = None
+                            if hasattr(error, "message"):
+                                error_message = error.message
+                            else:
+                                error_message = error
+
+                            if throwable:
+                                return [error_message, error]
+                        continue
 
             self.driver.close()
             return ["Your message successfully sent", None]

@@ -52,7 +52,10 @@ def main():
         destination = args.destination
         text = args.text
 
-        [program_message, error] = Message(phone, destination, text).message()
+        if len(destination.split(",")) > 1:
+            [program_message, error] = Message(phone, destination, text).broadcast()
+        else:
+            [program_message, error] = Message(phone, destination, text).message()
 
     print(program_message)
     if error:
